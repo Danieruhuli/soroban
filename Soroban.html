@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!-- Modificación educativa del original disponible en https://www.rightlobemath.com/digitalabacus/abacus_rebuild.html, adaptada para clases de japonés por Danieru Hu Li. -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<meta name="keywords" content="soroban, abacus, ábaco, math">
+		<meta name="description" content="An online soroban abacus designed to play online and illustrate the use of this ancient oriental calculator">
+		<link rel="stylesheet" type="text/css" href="./Resources/Soroban.css">
+		<title>Soroban</title>
+	</head>
+	<body>
+			<div id="soundToggleContainer" style="position: fixed; left: 10px; top: 10px; z-index: 1000; font-size: 20px; background: rgba(255,255,255,0.8); padding: 6px 10px; border-radius: 8px;">
+				<label for="soundToggle" style="cursor: pointer;">
+					<input type="checkbox" id="soundToggle" checked>
+					<span id="soundIcon">🔊</span>
+				</label>
+			</div>
+			<div id="canvasdiv">
+			<canvas id="canvas" width="740" height="320">
+				Sorry, this application needs HTML5 canvas support, please upgrade you browser. Thanks
+				Lo siento, esta aplicación necesita soporte para HTML5, por favor actualice su navegador. Gracias
+			</canvas>
+			</div>
+			<fieldset>
+				<legend>番号(Bangou)</legend>
+				<label><input type="radio" name="bangouMode" id="bangouModeNA" value="na" checked> N/A</label>
+				<label><input type="radio" name="bangouMode" id="bangouModeRomaji" value="romaji"> Romaji</label>
+				<label><input type="radio" name="bangouMode" id="bangouModeHiragana" value="hiragana"> ひらがな</label>
+				<label><input type="radio" name="bangouMode" id="bangouModeKanji" value="kanji"> 漢字</label>
+				<div id="bangou">0</div>
+			</fieldset>
+			<fieldset>
+				<legend>Settings</legend>
+			Number of Rods:
+			<select id="numberOfRods">
+				<option value="5">5</option>
+				<!-- <option value="11">11</option>
+				<option value="13">13</option>
+				<option value="15" selected="">15</option>
+				<option value="17">17</option>
+				<option value="19">19</option>
+				<option value="21">21</option> -->
+			</select>
+			<input class="button" id="reset" type="button" value="Reset"> 
+			</fieldset>
+		<br>
+		<audio id="beadSound" src="https://www.rightlobemath.com/digitalabacus/clac.wav" style="display: none;"></audio>
+<br><br>	
+		
+		<script src="./Resources/Soroban.js"></script>
+		
+	
+</body></html>
