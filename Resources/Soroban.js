@@ -396,35 +396,123 @@ function updateBangou() {
 	}
 	var displayValues = values.slice(firstNonZero);
 	if (bangouMode === 'romaji' || bangouMode === 'hiragana' || bangouMode === 'kanji') {
-		for (var i = 0; i < displayValues.length; i++) {
-			var positionFromRight = displayValues.length - 1 - i;
+		var tokens = [];
+		var len = displayValues.length;
+
+		var romajiDigits = {1:'Ichi',2:'Ni',3:'San',4:'Yon',5:'Go',6:'Roku',7:'Nana',8:'Hachi',9:'Kyuu'};
+		var romajiUnits = {1:'Juu',2:'Hyaku',3:'Sen',4:'Man'};
+
+		var kanaDigits = {1:'いち',2:'に',3:'さん',4:'よん',5:'ご',6:'ろく',7:'なな',8:'はち',9:'きゅう'};
+		var kanaUnits = {1:'じゅう',2:'ひゃく',3:'せん',4:'まん'};
+
+		var kanjiDigits = {1:'一',2:'二',3:'三',4:'四',5:'五',6:'六',7:'七',8:'八',9:'九'};
+		var kanjiUnits = {1:'十',2:'百',3:'千',4:'万'};
+
+		for (var i = 0; i < len; i++) {
 			var digit = displayValues[i];
-			var label = '';
-			if (positionFromRight >= 1 && positionFromRight <= 4 && digit !== 0) {
-				if (positionFromRight === 1) {
-					label = bangouMode === 'romaji' ? 'Juu' : bangouMode === 'hiragana' ? 'じゅう' : '十';
-				} else if (positionFromRight === 2) {
-					if (digit === 3) {
-						label = bangouMode === 'romaji' ? 'Byaku' : bangouMode === 'hiragana' ? 'びゃく' : '百';
-					} else if (digit === 6 || digit === 8) {
-						label = bangouMode === 'romaji' ? 'Pyaku' : bangouMode === 'hiragana' ? 'ぴゃく' : '百';
+			var positionFromRight = len - 1 - i; // 0 = ones, 1 = tens, 2 = hundreds, 3 = thousands, 4 = ten-thousands
+			if (digit === 0) {
+				continue;
+			}
+
+			if (bangouMode === 'kanji') {
+				if (positionFromRight === 0) {
+					tokens.push(kanjiDigits[digit]);
+				} else if (positionFromRight >= 1 && positionFromRight <= 4) {
+					// For tens/hundreds/thousands omit the '一' when digit === 1, but include it for 万 (position 4)
+					if (digit === 1 && positionFromRight !== 4) {
+						tokens.push(kanjiUnits[positionFromRight]);
 					} else {
-						label = bangouMode === 'romaji' ? 'Hyaku' : bangouMode === 'hiragana' ? 'ひゃく' : '百';
+						tokens.push(kanjiDigits[digit] + ' ' + kanjiUnits[positionFromRight]);
 					}
-				} else if (positionFromRight === 3) {
-					if (digit === 3) {
-						label = bangouMode === 'romaji' ? 'Zen' : bangouMode === 'hiragana' ? 'ぜん' : '千';
-					} else {
-						label = bangouMode === 'romaji' ? 'Sen' : bangouMode === 'hiragana' ? 'せん' : '千';
-					}
-				} else if (positionFromRight === 4) {
-					label = bangouMode === 'romaji' ? 'Man' : bangouMode === 'hiragana' ? 'まん' : '万';
+				} else {
+					tokens.push(kanjiDigits[digit]);
 				}
-				if (label) {
-					displayValues[i] = digit + ' ' + label;
+			} else if (bangouMode === 'romaji') {
+				if (positionFromRight === 0) {
+					tokens.push(romajiDigits[digit]);
+				} else if (positionFromRight === 1) { // tens
+					if (digit === 1) {
+						tokens.push(romajiUnits[1]);
+					} else {
+						tokens.push(romajiDigits[digit] + ' ' + romajiUnits[1]);
+					}
+				} else if (positionFromRight === 2) { // hundreds
+					// exceptions: 300 -> sanbyaku, 600 -> roppyaku, 800 -> happyaku
+					if (digit === 3) {
+						tokens.push('San Byaku');
+					} else if (digit === 6) {
+						tokens.push('Roppyaku');
+					} else if (digit === 8) {
+						tokens.push('Happyaku');
+					} else if (digit === 1) {
+						tokens.push(romajiUnits[2]);
+					} else {
+						tokens.push(romajiDigits[digit] + ' ' + romajiUnits[2]);
+					}
+				} else if (positionFromRight === 3) { // thousands
+					// exceptions: 3000 -> sanzen, 8000 -> hassen
+						if (digit === 3) {
+							tokens.push('San Zen');
+						} else if (digit === 8) {
+							tokens.push('Hassen');
+					} else if (digit === 1) {
+						tokens.push(romajiUnits[3]);
+					} else {
+						tokens.push(romajiDigits[digit] + ' ' + romajiUnits[3]);
+					}
+				} else if (positionFromRight === 4) { // ten-thousands (万)
+					// for 万 include the 'ichi' when digit === 1 (read as 'ichi man')
+					tokens.push(romajiDigits[digit] + ' ' + romajiUnits[4]);
+				} else {
+					tokens.push(romajiDigits[digit]);
+				}
+			} else if (bangouMode === 'hiragana') {
+				if (positionFromRight === 0) {
+					tokens.push(kanaDigits[digit]);
+				} else if (positionFromRight === 1) { // tens
+					if (digit === 1) {
+						tokens.push(kanaUnits[1]);
+					} else {
+						tokens.push(kanaDigits[digit] + ' ' + kanaUnits[1]);
+					}
+				} else if (positionFromRight === 2) { // hundreds
+					if (digit === 3) {
+						tokens.push('さん びゃく');
+					} else if (digit === 6) {
+						tokens.push('ろっぴゃく');
+					} else if (digit === 8) {
+						tokens.push('はっぴゃく');
+					} else if (digit === 1) {
+						tokens.push(kanaUnits[2]);
+					} else {
+						tokens.push(kanaDigits[digit] + ' ' + kanaUnits[2]);
+					}
+				} else if (positionFromRight === 3) { // thousands
+					if (digit === 3) {
+						tokens.push('さん ぜん');
+					} else if (digit === 8) {
+						tokens.push('はっせん');
+					} else if (digit === 1) {
+						tokens.push(kanaUnits[3]);
+					} else {
+						tokens.push(kanaDigits[digit] + ' ' + kanaUnits[3]);
+					}
+				} else if (positionFromRight === 4) { // 万
+					tokens.push(kanaDigits[digit] + ' ' + kanaUnits[4]);
+				} else {
+					tokens.push(kanaDigits[digit]);
 				}
 			}
 		}
+
+		// If nothing was pushed (e.g., the number is 0), fallback to showing 0
+		if (tokens.length === 0) {
+			bangouElement.textContent = displayValues.join(' ');
+		} else {
+			bangouElement.textContent = tokens.join(' ');
+		}
+		return;
 	}
 	bangouElement.textContent = displayValues.join(' ');
 }
